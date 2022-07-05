@@ -11,6 +11,8 @@ from tqdm import tqdm
 import time
 from urllib import request
 import sys
+from pdf2image import convert_from_path
+import glob
 is_colab = 'google.colab' in sys.modules
 
 class Util:
@@ -80,7 +82,9 @@ class Util:
         target_files = glob.glob(input_dir+"/**/*.pdf", recursive=True)
 
         for file in target_files:
-            Util.pdfFromLocal(file, output_dir, process, ruby)
+            x = Util.pdfFromLocal(file, output_dir, process, ruby)
+        
+        return x
 
     @staticmethod
     def imgFromUrl(url, output_dir, process, ruby):
@@ -258,6 +262,8 @@ class Util:
         self.tmp_img_dir = tmp_img_dir
 
     def main(self):
+        print("### OCR処理を実行しています。 ###")
+
         self.getProcessParam()
         self.createOutputDirIfExist()
 
