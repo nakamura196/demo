@@ -79,7 +79,8 @@ class PdfTask:
                     textAnnotations.append(e)
                 textAnnotations.append(e)
 
-        pdf_tmp_dir = output_dir + "/tmp"
+        output_id_dir = output_dir + "/" + file_id
+        pdf_tmp_dir = output_id_dir + "/tmp"
         os.makedirs(pdf_tmp_dir, exist_ok=True)
 
         if not os.path.exists("gcv2hocr.py"):
@@ -119,14 +120,14 @@ class PdfTask:
             
             # !python gcv2hocr.py $json_output_path > $hocr_output_path
             line = "python gcv2hocr.py \"{}\" > \"{}\"".format(json_output_path, hocr_output_path)
-            print(line)
+            # print(line)
             subprocess.call(line, shell=True)
             
         if not os.path.exists("hocr-pdf.py"):
             # !wget https://raw.githubusercontent.com/nakamura196/ndl_ocr/main/lib/hocr-pdf.py 
             request.urlretrieve("https://raw.githubusercontent.com/nakamura196/ndl_ocr/main/lib/hocr-pdf.py", "hocr-pdf.py")
 
-        pdf_path = output_dir + "/" + file_id + ".pdf"
+        pdf_path = output_id_dir + "/" + file_id + ".pdf"
         # !python hocr-pdf.py --savefile $pdf_path $pdf_tmp_dir
         line = "python hocr-pdf.py --savefile {} {}".format(pdf_path, pdf_tmp_dir)
         # subprocess.call(["python", "hocr-pdf.py", "--savefile", pdf_path, pdf_tmp_dir], shell=True)
