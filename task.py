@@ -13,9 +13,10 @@ from urllib import request
 import sys
 from pdf2image import convert_from_path
 import glob
+from pdf_task import PdfTask
 is_colab = 'google.colab' in sys.modules
 
-class Util:
+class Task:
 
     tmp_top_dir = "/tmp"
 
@@ -23,10 +24,10 @@ class Util:
         pass
 
     @staticmethod
-    def pdfFromUrl(url, output_dir, process, ruby):
+    def pdfFromUrl(url, output_dir, process, ruby, debug=True):
         # output_dir = str(Path(output_dir))
 
-        x = Util()
+        x = Task()
         x.url = url
         x.output_dir = str(Path(output_dir))
         x.process = process
@@ -42,15 +43,15 @@ class Util:
 
         x.createImagesFromPDF()
 
-        x.main()
+        x.main(debug)
 
         return x
 
     @staticmethod
-    def pdfFromLocal(input_file, output_dir, process, ruby):
+    def pdfFromLocal(input_file, output_dir, process, ruby, debug=True):
         output_dir = str(Path(output_dir))
 
-        x = Util()
+        x = Task()
         # x.url = url
 
         # パラメータの設定
@@ -67,30 +68,30 @@ class Util:
         x.tmp_pdf_path = "{}/{}.pdf".format(x.tmp_dir, x.filename)
 
         # x.downloadFile(x.tmp_pdf_path)
-        Util.copyFile(input_file, x.tmp_pdf_path)
+        Task.copyFile(input_file, x.tmp_pdf_path)
 
         x.createImagesFromPDF()
 
-        x.main()
+        x.main(debug)
 
         return x
 
     @staticmethod
-    def pdfFromLocalDir(input_dir, output_dir, process, ruby):
+    def pdfFromLocalDir(input_dir, output_dir, process, ruby, debug=True):
         input_dir = str(Path(input_dir))
 
         target_files = glob.glob(input_dir+"/**/*.pdf", recursive=True)
 
         for file in target_files:
-            x = Util.pdfFromLocal(file, output_dir, process, ruby)
+            x = Task.pdfFromLocal(file, output_dir, process, ruby)
         
         return x
 
     @staticmethod
-    def imgFromUrl(url, output_dir, process, ruby):
+    def imgFromUrl(url, output_dir, process, ruby, debug=True):
         # output_dir = str(Path(output_dir))
 
-        x = Util()
+        x = Task()
         x.url = url
         x.output_dir = str(Path(output_dir))
         x.process = process
@@ -105,15 +106,15 @@ class Util:
 
         # x.createImagesFromPDF()
 
-        x.main()
+        x.main(debug)
 
         return x
 
     @staticmethod
-    def imgFromLocal(input_file, output_dir, process, ruby):
+    def imgFromLocal(input_file, output_dir, process, ruby, debug=True):
         # output_dir = str(Path(output_dir))
 
-        x = Util()
+        x = Task()
         # x.url = url
         x.output_dir = str(Path(output_dir))
         x.process = process
@@ -127,22 +128,22 @@ class Util:
 
         path = x.tmp_img_dir+"/"+x.filename+".jpg"
         # x.downloadFile(path)
-        Util.copyFile(input_file, path)
+        Task.copyFile(input_file, path)
 
         # x.createImagesFromPDF()
 
-        x.main()
+        x.main(debug)
 
         return x
 
     @staticmethod
-    def imgFromLocalDir(input_dir, output_dir, process, ruby):
+    def imgFromLocalDir(input_dir, output_dir, process, ruby, debug=True):
         output_dir = str(Path(output_dir))
 
         input_dir = str(Path(input_dir))
 
 
-        x = Util()
+        x = Task()
         # x.url = url
 
         # パラメータの設定
@@ -155,15 +156,15 @@ class Util:
         x.tmp_dir = input_dir
         x.output_dir = "{}/{}".format(output_dir, folder_name)
 
-        x.main()
+        x.main(debug)
 
         return x
 
     @staticmethod
-    def iiif(url, output_dir, process, ruby, process_size, sleep_time):
+    def iiif(url, output_dir, process, ruby, process_size, sleep_time, debug=True):
         # output_dir = str(Path(output_dir))
 
-        x = Util()
+        x = Task()
 
         # パラメータの設定
         x.url = url
@@ -180,7 +181,7 @@ class Util:
 
         x.downloadImages()
 
-        x.main()
+        x.main(debug)
 
         return x
 
@@ -208,7 +209,7 @@ class Util:
 
     @staticmethod
     def copyFile(in_, out_):
-        shutil.copyfile(in_, out_)
+        shTask.copyfile(in_, out_)
 
     @staticmethod
     def updateConfigRuby(path, ruby):
@@ -261,15 +262,16 @@ class Util:
 
         self.tmp_img_dir = tmp_img_dir
 
-    def main(self):
-        print("### OCR処理を実行しています。 ###")
+    def main(self, debug):
+        if debug:
+            print("### OCR処理を実行しています。 ###")
 
         self.getProcessParam()
         self.createOutputDirIfExist()
 
         c = "config.yml"
 
-        Util.updateConfigRuby(c, self.ruby)
+        Task.updateConfigRuby(c, self.ruby)
 
         input_dir = self.tmp_dir
         output_dir = self.output_dir
@@ -278,6 +280,30 @@ class Util:
         line = "python main.py infer -c {} -s s {} {} -x -i -p {}".format(c, input_dir, output_dir, p)
 
         subprocess.call(line, shell=True)
+
+        self.mergeTxtAndDownload()
+
+        print(input_dir, output_dir)
+        PdfTask.createPdf(input_dir, output_dir)
+
+    def mergeTxtAndDownload(self):
+        output_dir = self.output_dir
+        tmp_dirs = glob.glob(output_dir + "/*/txt")
+        txt_dir = tmp_dirs[0]
+        
+        file_id = txt_dir.split("/")[-2]
+        output_id_dir = output_dir + "/" + file_id
+
+        txt_files = glob.glob(txt_dir + "/*.txt")
+        txt_files = sorted(txt_files)
+        merged_txt_file_path = output_id_dir + "/" + file_id + '.txt'
+        merged_txt_file = open(merged_txt_file_path, 'a')
+        for each_txt_file_path in txt_files:
+            each_txt_file = open(each_txt_file_path, 'r')
+            data = each_txt_file.read()
+            each_txt_file.close()
+            merged_txt_file.write(data+"\n")
+        merged_txt_file.close()
 
     def getProcessParam(self):
         process = self.process
@@ -303,7 +329,7 @@ class Util:
         self.output_dir = output_dir
 
         # 親フォルダの作成
-        Util.createParentDir(self.output_dir)
+        Task.createParentDir(self.output_dir)
 
     @staticmethod
     def createParentDir(path):

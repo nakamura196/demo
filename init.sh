@@ -34,3 +34,7 @@ wget https://lab.ndl.go.jp/dataset/ndlocr/appendix/simple_reading_order_model.jo
 # 6. PDFを画像に変換するためのパッケージのインストール
 apt-get install poppler-utils
 pip install pdf2image
+
+# transparent
+pip install python-bidi
+pip install reportlab
