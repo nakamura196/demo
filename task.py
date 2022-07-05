@@ -209,7 +209,7 @@ class Task:
 
     @staticmethod
     def copyFile(in_, out_):
-        shTask.copyfile(in_, out_)
+        Task.copyfile(in_, out_)
 
     @staticmethod
     def updateConfigRuby(path, ruby):
@@ -283,7 +283,7 @@ class Task:
 
         self.mergeTxtAndDownload()
 
-        print(input_dir, output_dir)
+        # print(input_dir, output_dir)
         PdfTask.createPdf(input_dir, output_dir)
 
     def mergeTxtAndDownload(self):
