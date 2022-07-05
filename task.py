@@ -68,7 +68,7 @@ class Task:
         x.tmp_pdf_path = "{}/{}.pdf".format(x.tmp_dir, x.filename)
 
         # x.downloadFile(x.tmp_pdf_path)
-        shutil.copyFile(input_file, x.tmp_pdf_path)
+        Task.copyFile(input_file, x.tmp_pdf_path)
 
         x.createImagesFromPDF()
 
@@ -209,7 +209,7 @@ class Task:
 
     @staticmethod
     def copyFile(in_, out_):
-        Task.copyfile(in_, out_)
+        shutil.copyfile(in_, out_)
 
     @staticmethod
     def updateConfigRuby(path, ruby):
