@@ -10,8 +10,7 @@ pip install -r $PROJECT_DIR/requirements.txt
 pip install torch==1.8.1+cu111 torchvision==0.9.1+cu111 -f https://download.pytorch.org/whl/lts/1.8/torch_lts.html
 pip install mmcv-full==1.4.0 -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.8.0/index.html
 
-##numpyのバージョン問題でcolabでは動かなかったのでアップデートする(参考:https://stackoverflow.com/questions/66060487/valueerror-numpy-ndarray-size-changed-may-indicate-binary-incompatibility-exp)
-pip install --upgrade numpy
+#pip install --upgrade numpy
 
 cd $PROJECT_DIR/src/ndl_layout/mmdetection
 python setup.py bdist_wheel
