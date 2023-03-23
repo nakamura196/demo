@@ -262,50 +262,56 @@ class Task:
 
         self.tmp_img_dir = tmp_img_dir
 
-    def main(self, debug):
+    def main(self, debug: bool) -> None:
+        """
+        OCR処理を実行し、結果を出力ディレクトリに保存するメイン関数。
+
+        :param debug: デバッグモードが有効かどうかを示すブール値。
+        """
         if debug:
             print("### OCR処理を実行しています。 ###")
 
-        self.getProcessParam()
-        self.createOutputDirIfExist()
+        self.get_process_param()
+        self.create_output_dir_if_exist()
 
-        c = "config.yml"
+        config_file = "config.yml"
 
-        Task.updateConfigRuby(c, self.ruby)
+        Task.updateConfigRuby(config_file, self.ruby)
 
         input_dir = self.tmp_dir
         output_dir = self.output_dir
-        p = self.p
+        process = self.p
 
-        line = "python main.py infer -c {} -s s {} {} -x -i -p {}".format(c, input_dir, output_dir, p)
+        command_line = f"python main.py infer -c {config_file} -s s \"{input_dir}\" \"{output_dir}\" -x -i -p {process}"
 
-        subprocess.call(line, shell=True)
+        subprocess.call(command_line, shell=True)
 
-        self.mergeTxtAndDownload()
+        self.merge_txt_and_download()
 
-        # print(input_dir, output_dir)
         PdfTask.createPdf(input_dir, output_dir)
 
-    def mergeTxtAndDownload(self):
+    def merge_txt_and_download(self) -> None:
+        """
+        テキストファイルをマージし、結果を指定された出力ディレクトリに保存する。
+        """
         output_dir = self.output_dir
-        tmp_dirs = glob.glob(output_dir + "/*/txt")
+        tmp_dirs = glob.glob(os.path.join(output_dir, "*/txt"))
         txt_dir = tmp_dirs[0]
         
-        file_id = txt_dir.split("/")[-2]
-        output_id_dir = output_dir + "/" + file_id
+        file_id = os.path.basename(os.path.dirname(txt_dir))
+        output_id_dir = os.path.join(output_dir, file_id)
 
-        txt_files = glob.glob(txt_dir + "/*.txt")
-        txt_files = sorted(txt_files)
-        merged_txt_file_path = output_id_dir + "/" + file_id + '.txt'
-        merged_txt_file = open(merged_txt_file_path, 'a')
-        for each_txt_file_path in txt_files:
-            each_txt_file = open(each_txt_file_path, 'r')
-            data = each_txt_file.read()
-            each_txt_file.close()
-            merged_txt_file.write(data+"\n")
-        merged_txt_file.close()
+        txt_files = glob.glob(os.path.join(txt_dir, "*.txt"))
+        txt_files.sort()
+        merged_txt_file_path = os.path.join(output_id_dir, f"{file_id}.txt")
 
-    def getProcessParam(self):
+        with open(merged_txt_file_path, 'a', encoding="utf-8") as merged_txt_file:
+            for each_txt_file_path in txt_files:
+                with open(each_txt_file_path, 'r', encoding="utf-8") as each_txt_file:
+                    data = each_txt_file.read()
+                    merged_txt_file.write(f"{data}\n")
+
+    def get_process_param(self):
         process = self.process
         p = "0..3"
         if process == "傾き補正,レイアウト抽出,文字認識(OCR)":
@@ -317,7 +323,7 @@ class Task:
         # return p
         self.p = p
 
-    def createOutputDirIfExist(self): # output_dir, p):
+    def create_output_dir_if_exist(self): # output_dir, p):
         output_dir = self.output_dir
         p = self.p
         output_dir = output_dir + "@p" + p 
