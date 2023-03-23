@@ -9,6 +9,7 @@ PROJECT_DIR="/content/ndlocr_cli"
 
 # colabでインストールに時間を要するものを除外
 sed -i -e 's/scipy/#scipy/g' $PROJECT_DIR/requirements.txt
+sed -i -e 's/scikit/#scikit/g' $PROJECT_DIR/requirements.txt
 
 pip install -r $PROJECT_DIR/requirements.txt
 pip install torch==1.8.1+cu111 torchvision==0.9.1+cu111 -f https://download.pytorch.org/whl/lts/1.8/torch_lts.html
