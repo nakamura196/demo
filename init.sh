@@ -8,12 +8,15 @@ git clone --recursive https://github.com/ndl-lab/ndlocr_cli
 PROJECT_DIR="/content/ndlocr_cli"
 
 # colabでインストールに時間を要するものを除外
-sed -i -e 's/scipy/#scipy/g' $PROJECT_DIR/requirements.txt
-sed -i -e 's/scikit/#scikit/g' $PROJECT_DIR/requirements.txt
+# sed -i -e 's/scipy/#scipy/g' $PROJECT_DIR/requirements.txt
+# sed -i -e 's/scikit/#scikit/g' $PROJECT_DIR/requirements.txt
 
-pip install -r $PROJECT_DIR/requirements.txt
-pip install torch==1.8.1+cu111 torchvision==0.9.1+cu111 -f https://download.pytorch.org/whl/lts/1.8/torch_lts.html
-pip install mmcv-full==1.4.0 -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.8.0/index.html
+# pip install -r $PROJECT_DIR/requirements.txt
+# pip install torch==1.8.1+cu111 torchvision==0.9.1+cu111 -f https://download.pytorch.org/whl/lts/1.8/torch_lts.html
+# pip install mmcv-full==1.4.0 -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.8.0/index.html
+
+pip install mmcv==2.0.0 -f https://download.openmmlab.com/mmcv/dist/cu118/torch2.0/index.html
+pip install mmdet==3.0.0
 
 cd $PROJECT_DIR/src/ndl_layout/mmdetection
 python setup.py bdist_wheel
