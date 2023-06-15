@@ -224,7 +224,7 @@ class Task:
         # self.tmp_pdf_path = "{}/{}.pdf".format(self.tmp_dir, self.filename)
         
         filename = Path(path) # self.tmp_pdf_path
-        response = requests.get(self.url)
+        response = requests.get(self.url, verify=False)
         filename.write_bytes(response.content)
 
     def createImagesFromPDF(self):
