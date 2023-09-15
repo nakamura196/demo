@@ -15,6 +15,8 @@ from pdf2image import convert_from_path
 import glob
 from pdf_task import PdfTask
 is_colab = 'google.colab' in sys.modules
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class Task:
 
@@ -296,7 +298,14 @@ class Task:
         """
         output_dir = self.output_dir
         tmp_dirs = glob.glob(os.path.join(output_dir, "*/txt"))
-        txt_dir = tmp_dirs[0]
+        
+        # txt_dir = tmp_dirs[0]
+        if tmp_dirs:
+            txt_dir = tmp_dirs[0]
+        else:
+            # appropriate error handling here
+            print("Error: tmp_dirs list is empty.")
+            exit()
         
         file_id = os.path.basename(os.path.dirname(txt_dir))
         output_id_dir = os.path.join(output_dir, file_id)
