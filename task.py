@@ -305,7 +305,7 @@ class Task:
         else:
             # appropriate error handling here
             print("Error: tmp_dirs list is empty.")
-            exit()
+            return
         
         file_id = os.path.basename(os.path.dirname(txt_dir))
         output_id_dir = os.path.join(output_dir, file_id)
